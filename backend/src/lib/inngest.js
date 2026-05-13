@@ -7,7 +7,7 @@ export const inngest = new Inngest({ id: "BrainBridge" });
 const syncUser = inngest.createFunction(
   {
     id: "sync-user",
-    triggers: [{ event: "clerk/user.created" }],
+    triggers: { event: "clerk/user.created" },
   },
 
   async ({ event }) => {
@@ -35,7 +35,7 @@ const syncUser = inngest.createFunction(
 const deleteUserFromDB = inngest.createFunction(
   {
     id: "delete-user-from-db",
-    triggers: [{ event: "clerk/user.deleted" }],
+    triggers: { event: "clerk/user.deleted" },
   },
 
   async ({ event }) => {
