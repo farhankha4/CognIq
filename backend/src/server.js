@@ -51,3 +51,4 @@ if (ENV.NODE_ENV !== "production") {
 }
 
 export default app; // ✅ Vercel needs this
+//succesfully deployed and running completely fine
