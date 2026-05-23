@@ -12,9 +12,11 @@
   "dependencies": {
     "@clerk/clerk-react": "^5.53.3",
     "@clerk/react": "^6.5.0",
+    "@tailwindcss/vite": "^4.3.0",
     "dotenv": "^17.4.2",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
+    "tailwindcss": "^4.3.0",
     "vercel": "^53.4.0"
   },
   "devDependencies": {
