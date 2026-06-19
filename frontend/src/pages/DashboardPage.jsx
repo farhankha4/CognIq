@@ -31,6 +31,7 @@ function DashboardPage() {
       },
       {
         onSuccess: (data) => {
+          console.log("CREATE SESSION RESPONSE:", data);
           setShowCreateModal(false);
           navigate(`/session/${data.session._id}`);
         },
