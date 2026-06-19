@@ -5,25 +5,44 @@ export const protectRoute = [
   requireAuth(),
   async (req, res, next) => {
     try {
+      console.log("========== PROTECT ROUTE ==========");
+
+      // Log full auth object
       console.log("AUTH:", req.auth());
 
-      const clerkId = req.auth().userId;
+      const clerkId = req.auth()?.userId;
+
       console.log("CLERK ID:", clerkId);
 
-      if (!clerkId) return res.status(401).json({ message: "Unauthorized - invalid token" });
+      if (!clerkId) {
+        console.log("❌ No Clerk ID found");
+        return res.status(401).json({
+          message: "Unauthorized - invalid token",
+        });
+      }
 
-      // find user in db by clerk ID
       const user = await User.findOne({ clerkId });
 
-      if (!user) return res.status(404).json({ message: "User not found" });
+      console.log("USER FOUND:", user);
 
-      // attach user to req
+      if (!user) {
+        console.log("❌ User not found in MongoDB");
+        return res.status(404).json({
+          message: "User not found",
+          clerkId,
+        });
+      }
+
       req.user = user;
+
+      console.log("✅ req.user attached:", req.user._id);
 
       next();
     } catch (error) {
-      console.error("Error in protectRoute middleware", error);
-      res.status(500).json({ message: "Internal Server Error" });
+      console.error("❌ Error in protectRoute middleware:", error);
+      res.status(500).json({
+        message: "Internal Server Error",
+      });
     }
   },
 ];
