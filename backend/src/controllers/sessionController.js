@@ -3,6 +3,7 @@ import Session from "../models/Session.js";
 
 export async function createSession(req, res) {
   try {
+    console.log("REQ.USER:", req.user);
     const { problem, difficulty } = req.body;
     const userId = req.user._id;
     const clerkId = req.user.clerkId;
@@ -58,6 +59,7 @@ export async function getActiveSessions(_, res) {
 
 export async function getMyRecentSessions(req, res) {
   try {
+    console.log("REQ.USER:", req.user);
     const userId = req.user._id;
 
     // get sessions where user is either host or participant
