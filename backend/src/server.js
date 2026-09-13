@@ -84,8 +84,8 @@ if (ENV.NODE_ENV === "production") {
 }
 
 // Keep this for local dev
-if (ENV.NODE_ENV !== "production") {
-  app.listen(ENV.PORT, () => console.log("Server running on port:", ENV.PORT));
+if (!process.env.VERCEL && ENV.NODE_ENV !== "production") {
+  app.listen(ENV.PORT || 5000, () => console.log("Server running on port:", ENV.PORT || 5000));
 }
 
 export default app; // ✅ Vercel needs this
