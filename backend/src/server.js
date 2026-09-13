@@ -48,6 +48,16 @@ app.use(
 );
 app.use(clerkMiddleware()); // this adds auth field to request object: req.auth()
 
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    console.error("Database connection error:", err);
+    res.status(500).json({ message: "Database connection failed" });
+  }
+});
+
 app.use("/api/inngest", serve({ client: inngest, functions }));
 
 app.use("/api/chat", chatRoutes);
@@ -63,6 +73,7 @@ app.get("/", (req, res) => {
     message: "CogniQ Backend is running 🚀",
   });
 });
+
 // make our app ready for deployment
 if (ENV.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "../frontend/dist")));
@@ -71,17 +82,6 @@ if (ENV.NODE_ENV === "production") {
     res.sendFile(path.join(__dirname, "../frontend", "dist", "index.html"));
   });
 }
-
-// const startServer = async () => {
-//   try {
-//     await connectDB();
-//     app.listen(ENV.PORT, () => console.log("Server is running on port:", ENV.PORT));
-//   } catch (error) {
-//     console.error("💥 Error starting the server", error);
-//   }
-// };
-
-await connectDB();
 
 // Keep this for local dev
 if (ENV.NODE_ENV !== "production") {
