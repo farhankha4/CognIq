@@ -14,10 +14,38 @@ const app = express();
 
 const __dirname = path.resolve();
 
-// middleware
+const allowedOrigins = [
+  ENV.CLIENT_URL,
+  "https://your-cogniq.vercel.app",
+  "http://localhost:5173",
+  "http://localhost:5000",
+]
+  .filter(Boolean)
+  .map((url) => url.replace(/\/$/, ""));
+
 app.use(express.json());
-// credentials:true meaning?? => server allows a browser to include cookies on request
-app.use(cors({ origin: ENV.CLIENT_URL, credentials: true }));
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+
+      const cleanOrigin = origin.replace(/\/$/, "");
+      if (
+        allowedOrigins.includes(cleanOrigin) ||
+        cleanOrigin.endsWith(".vercel.app")
+      ) {
+        callback(null, true);
+      } else {
+        console.warn(`[CORS Blocked] Origin not allowed: ${origin}`);
+        callback(null, false);
+      }
+    },
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept"],
+  })
+);
 app.use(clerkMiddleware()); // this adds auth field to request object: req.auth()
 
 app.use("/api/inngest", serve({ client: inngest, functions }));
