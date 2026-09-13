@@ -21,16 +21,45 @@ export const protectRoute = [
         });
       }
 
-      const user = await User.findOne({ clerkId });
+      let user = await User.findOne({ clerkId });
 
       console.log("USER FOUND:", user);
 
       if (!user) {
-        console.log("❌ User not found in MongoDB");
-        return res.status(404).json({
-          message: "User not found",
-          clerkId,
-        });
+        console.log("⚠️ User not found in MongoDB. Attempting auto-sync from Clerk...");
+        try {
+          const { clerkClient } = await import("@clerk/express");
+          const { upsertStreamUser } = await import("../lib/stream.js");
+
+          const clerkUser = await clerkClient.users.getUser(clerkId);
+          const email =
+            clerkUser.emailAddresses?.find((e) => e.id === clerkUser.primaryEmailAddressId)
+              ?.emailAddress || clerkUser.emailAddresses[0]?.emailAddress || "";
+          const name =
+            `${clerkUser.firstName || ""} ${clerkUser.lastName || ""}`.trim() || email || "User";
+          const profileImage = clerkUser.imageUrl || "";
+
+          user = await User.create({
+            clerkId,
+            email,
+            name,
+            profileImage,
+          });
+
+          await upsertStreamUser({
+            id: clerkId,
+            name,
+            image: profileImage,
+          });
+
+          console.log("✅ Auto-synced user to MongoDB and Stream:", user._id);
+        } catch (syncError) {
+          console.error("❌ Auto-sync failed:", syncError);
+          return res.status(404).json({
+            message: "User not found and auto-sync failed",
+            clerkId,
+          });
+        }
       }
 
       req.user = user;
