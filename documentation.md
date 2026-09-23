@@ -1,4 +1,4 @@
-# CognIq (BrainBridge) — Technical Documentation
+# CognIq — Technical Documentation
 
 **CognIq (BrainBridge)** is a full-stack, real-time collaborative coding and technical interview platform. It enables developers to host and participate in 1-on-1 live coding sessions featuring interactive code editing, multi-language code execution, real-time WebRTC video/audio calls, and integrated text chat.
 
